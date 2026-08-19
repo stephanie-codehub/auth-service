@@ -1,13 +1,16 @@
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 import uuid6
 from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.database.base import User
 from app.core.database.session import Base
 from app.features.audits.v1.schemas.enums import ActivityStatus, ActivityType
+
+if TYPE_CHECKING:
+    from app.features.users.v1.models import User
 
 
 class AuditRecord(Base):
