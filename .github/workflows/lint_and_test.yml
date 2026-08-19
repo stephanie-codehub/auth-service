@@ -1,0 +1,62 @@
+name: Lint and Test
+
+on:
+  push:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint_and_test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+   
+      - name: Install Dependencies
+        run: uv sync --frozen
+
+    
+      - name: Run Linter
+        run: uv run ruff check .
+
+      - name: Run Formatter Check
+        run: uv run ruff format --check .
+
+    
+      - name: Run Pytest
+        env:
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/db
+          TEST_DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/testdb
+          JWT_SECRET_KEY: test_secret_key
+          RESEND_API_KEY: mock_key
+          SENDER_EMAIL: test@example.com
+          API_BASE_URL: http://localhost:8000
+          ALLOWED_HOSTS: "localhost,127.0.0.1"
+          ALLOWED_ORIGINS: "http://localhost:8000,http://127.0.0.1:8000"
+        run: uv run pytest

@@ -1,0 +1,41 @@
+services:
+  api:
+    image: ghcr.io/${REPOSITORY_NAME}:latest
+    restart: always
+    environment:
+      - DATABASE_URL
+    ports:
+      - "8000:8000"  
+    networks:
+      - api_network
+      - db_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}        
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - db_network
+    expose:
+      - "5432"      
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data: 
+
+networks:
+  api_network:    
+  db_network:
+    internal: true

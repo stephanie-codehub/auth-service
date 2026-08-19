@@ -1,0 +1,91 @@
+name: CICD Pipeline 
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install Dependencies
+        run: |
+          uv sync --frozen
+
+      - name: Run Tests with Pytest
+        run: |
+          uv run pytest 
+
+  build-and-push-image:
+    needs: test-app
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Log in to GHCR
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }} 
+        password: ${{ secrets.GITHUB_TOKEN }} 
+
+    - name: Build and push Docker image to GHCR
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        target: runtime
+        push: true
+        tags: ghcr.io/${{ github.repository }}:latest
+
+
+  deploy-to-server:
+    needs: build-and-push-image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+  
+      - name: Copy Compose to Server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "docker-compose.yaml"
+          target: "/home/${{ secrets.SERVER_USER }}/${{ secrets.PROJECT_NAME }}"
+
+      - name: SSH and Update Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}     
+          username: ${{ secrets.SERVER_USER }} 
+          key: ${{ secrets.SERVER_SSH_KEY }}   
+          script: |
+            export REPOSITORY_NAME="${{ github.repository }}"
+            
+            mkdir -p /home/${{ secrets.SERVER_USER }}/${{ secrets.PROJECT_NAME }}
+            cd /home/${{ secrets.SERVER_USER }}/${{ secrets.PROJECT_NAME }}
+            
+            # pull the image
+            echo "${{ secrets.GH_CR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    
+            docker compose pull
+            docker compose up -d --remove-orphans
+
