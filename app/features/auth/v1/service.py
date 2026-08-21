@@ -20,7 +20,12 @@ from app.features.auth.v1.schemas.req import (
 )
 from app.features.auth.v1.schemas.res import TokenResponse
 from app.features.notifications.v1.email.service import EmailNotificationService
-from app.features.users.v1.models import RefreshToken, User, VerificationToken
+from app.features.users.v1.models import (
+    RefreshToken,
+    User,
+    UserRoleTable,
+    VerificationToken,
+)
 from app.features.users.v1.repository import (
     RefreshTokensRepository,
     UserRepository,
@@ -61,7 +66,7 @@ class AuthService:
             await self.verification_token_repo.delete_token_by_user_id(user.id)
         else:
             user = User(**input_data_dict)
-
+            user.roles = [UserRoleTable(user_role=UserRole.USER)]
         hashed_password = hash_password(input_data.password)
         user.hashed_password = hashed_password
         user.is_active = False

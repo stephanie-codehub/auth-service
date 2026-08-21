@@ -16,7 +16,11 @@ from app.features.users.v1.dependencies import (
     get_user_repo,
     get_verification_token_repo,
 )
-from app.features.users.v1.models import User
+from app.features.users.v1.models import (
+    User,
+    UserRoleTable,
+)
+from app.features.users.v1.schemas.enums import UserRole
 from app.main import app
 
 test_engine = create_async_engine(settings.test_database_url)
@@ -87,6 +91,7 @@ async def active_user(db_session):
         first_name="active",
         last_name="User",
         hashed_password=hash_password("SecurePassword123"),
+        roles=[UserRoleTable(user_role=UserRole.USER)],
         phone_number="+2347094989997",
         is_active=True,
     )
@@ -102,6 +107,7 @@ async def inactive_user(db_session):
         first_name="Inactive",
         last_name="User",
         hashed_password=hash_password("SecurePassword123"),
+        roles=[UserRoleTable(user_role=UserRole.USER)],
         phone_number="+2347094989997",
         is_active=False,
     )
@@ -112,20 +118,29 @@ async def inactive_user(db_session):
 
 @pytest.fixture
 async def test_admin(db_session):
-    user = User(email="admin_test@example.com", name="Test User", is_active=True)
+    user = User(
+        email="admin@example.com",
+        first_name="Admin",
+        last_name="User",
+        roles=[
+            UserRoleTable(user_role=UserRole.USER),
+            UserRoleTable(user_role=UserRole.ADMIN),
+        ],
+        is_active=True,
+    )
     db_session.add(user)
     await db_session.flush()
     return user
 
 
 @pytest.fixture
-async def auth_client(db_session, test_user):
+async def auth_client(db_session, active_user):
     app.dependency_overrides[get_session] = lambda: db_session
-    token = create_access_token(test_user.id, test_user.roles)
+    token = create_access_token(active_user.id, active_user.roles)
 
     async with AsyncClient(
         transport=ASGITransport(app=app),
-        base_url="http://test",
+        base_url="http://localhost/api/v1",
         headers={"Authorization": f"Bearer {token}"},
     ) as client:
         yield client

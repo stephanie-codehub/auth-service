@@ -28,7 +28,7 @@ async def update_user_profile(
     return ApiResponse(message="Profile updated successfully.", data=user)
 
 
-@user_router.post("/change-password", response_model=ApiResponse)
+@user_router.post("/profile/change-password", response_model=ApiResponse)
 async def change_user_password(
     input_data: ChangePasswordRequest,
     current_user: Annotated[User, Depends(get_current_user)],

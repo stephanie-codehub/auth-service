@@ -32,7 +32,7 @@ class User(Base):
     )
 
     roles: Mapped[list["UserRoleTable"]] = relationship(
-        back_populates="user", cascade="all, delete-orphan"
+        back_populates="user", cascade="all, delete-orphan", lazy="selectin"
     )
     verification_token: Mapped["VerificationToken|None"] = relationship(
         back_populates="user", cascade="all, delete-orphan"

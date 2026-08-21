@@ -20,7 +20,9 @@ auth_wrapper.include_router(
 )
 
 # AUTHENTICATED ADMIN ROUTES
-admin_wrapper.include_router(audit_router, prefix="/audits", tags=["System Audit Logs"])
+admin_wrapper.include_router(
+    audit_router, prefix="/audit_logs", tags=["System Audit Logs"]
+)
 admin_wrapper.include_router(admin_router, prefix="/admin", tags=["Admin"])
 admin_wrapper.include_router(
     notification_router, prefix="/notifications", tags=["Notifications"]

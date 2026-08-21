@@ -24,9 +24,7 @@ async def get_audit_logs(
     return ApiResponse(data=paginated_audit_logs)
 
 
-@audit_router.get(
-    "/audit_logs/{audit_log_id}", response_model=ApiResponse[AuditLogResponse]
-)
+@audit_router.get("/{audit_log_id}", response_model=ApiResponse[AuditLogResponse])
 async def get_audit_log_profile(
     audit_log_id: uuid.UUID,
     service: Annotated[
