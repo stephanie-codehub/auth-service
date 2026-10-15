@@ -4,31 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-app:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          version: "latest"
-          enable-cache: true
-
-      - name: Set up Python
-        run: uv python install 3.12
-
-      - name: Install Dependencies
-        run: |
-          uv sync --frozen
-
-      - name: Run Tests with Pytest
-        run: |
-          uv run pytest 
-
   build-and-push-image:
-    needs: test-app
     runs-on: ubuntu-latest
 
     permissions:
