@@ -3,7 +3,19 @@ services:
     image: ghcr.io/${REPOSITORY_NAME}:latest
     restart: always
     environment:
+      - API_BASE_URL
+      - DB_NAME
+      - DB_USER
+      - DB_PASSWORD
+      - DB_HOST
+      - DB_PORT
       - DATABASE_URL
+      - TEST_DATABASE_URL
+      - RESEND_API_KEY
+      - ALLOWED_HOSTS
+      - ALLOWED_ORIGINS
+      - SENDER_EMAIL
+      - JWT_SECRET_KEY
     ports:
       - "8000:8000"  
     networks:
