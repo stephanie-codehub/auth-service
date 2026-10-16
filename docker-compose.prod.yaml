@@ -15,7 +15,6 @@ services:
       - "8080:8000"  
     networks:
       - api_network
-      - db_network
     depends_on:
       postgres:
         condition: service_healthy
@@ -30,7 +29,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - db_network
+      - api_network
     expose:
       - "5432"      
     healthcheck:
@@ -44,5 +43,3 @@ volumes:
 
 networks:
   api_network:    
-  db_network:
-    internal: true
