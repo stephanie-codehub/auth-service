@@ -23,6 +23,10 @@ services:
   postgres:
     image: postgres:16-alpine
     restart: always
+    environment:
+      - POSTGRES_USER         
+      - POSTGRES_PASSWORD    
+      - POSTGRES_DB
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
