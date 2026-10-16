@@ -68,8 +68,8 @@ jobs:
             export DATABASE_URL="${{ secrets.DATABASE_URL }}"
             export TEST_DATABASE_URL="${{ secrets.TEST_DATABASE_URL }}"
             export RESEND_API_KEY="${{ secrets.RESEND_API_KEY }}"
-            export ALLOWED_HOSTS="${{ secrets.ALLOWED_HOSTS }}"
-            export ALLOWED_ORIGINS="${{ secrets.ALLOWED_ORIGINS }}"
+            export ALLOWED_HOSTS='${{ secrets.ALLOWED_HOSTS }}'
+            export ALLOWED_ORIGINS='${{ secrets.ALLOWED_ORIGINS }}'
             export SENDER_EMAIL="${{ secrets.SENDER_EMAIL }}"
             export JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}"
     
