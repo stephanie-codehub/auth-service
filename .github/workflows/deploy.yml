@@ -75,6 +75,6 @@ jobs:
             export SENDER_EMAIL="${{ secrets.SENDER_EMAIL }}"
             export JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}"
     
-            docker compose pull
-            docker compose up -d --remove-orphans
+            docker compose -f docker-compose.prod.yaml pull
+            docker compose -f docker-compose.prod.yaml up -d --remove-orphans
 
