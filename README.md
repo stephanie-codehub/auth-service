@@ -1,5 +1,7 @@
 # Auth Service API
-    
+
+[![CICD Pipeline](https://github.com/stephanie-codehub/auth-service/actions/workflows/deploy.yml/badge.svg)](https://github.com/stephanie-codehub/auth-service/actions/workflows/deploy.yml)
+
 ## Overview
 An asynchronous auth service API.
 
