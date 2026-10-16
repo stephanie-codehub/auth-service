@@ -74,6 +74,6 @@ jobs:
             export JWT_SECRET_KEY="${{ secrets.JWT_SECRET_KEY }}"
     
             docker compose -f docker-compose.prod.yaml pull
-            docker compose -f docker-compose.prod.yaml run --rm api uv run alembic upgrade head
+            docker compose -f docker-compose.prod.yaml run --rm api alembic upgrade head
             docker compose -f docker-compose.prod.yaml up -d --remove-orphans 
 
